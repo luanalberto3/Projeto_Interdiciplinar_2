@@ -14,7 +14,7 @@ const MISSOES = {
   5: { titulo: "Fase 5: Feirinha de Artesanato", texto: "Ancoramos perto do Mercado de Artesanato de Tambaú! Ganhamos um baú de lembrancinhas que precisa ser distribuído igualmente entre todos da turma. Qual recurso matemático fraciona essas quantidades?" },
   6: { titulo: "Fase 6: Reflorestamento na Lagoa (Desafio Duplo)", texto: "Missão no Parque da Lagoa! O robô precisa caminhar automaticamente ao redor da lagoa e exibir na tela o cálculo de mudas." },
   7: { titulo: "Fase 7: Patrulha em Picãozinho (Desafio Duplo)", texto: "Mergulho nas piscinas naturais! O robô fará uma patrulha ininterrupta pelo fundo do mar. Mas atenção: ele só deve fotografar SE encontrar um coral doente." },
-  8: { titulo: "Fase 8: Pane em Areia Vermelha (Desafio Mestre)", texto: "O tanque principal furou! Tome a decisão de ativar o motor de emergência 'Se' o nível ficar perigoso após perder combustível. Dica: Use um bloco de 'Comparação' para conectar a Matemática ao bloco 'Se', e o 'imprimir' para o motor." },
+  8: { titulo: "Fase 8: Pane em Areia Vermelha (Desafio Mestre)", texto: "O tanque principal furou! Tome a decisão de ativar o motor de emergência 'Se' o nível ficar perigoso após perder combustível." },
   9: { titulo: "🏆 Expedição Concluída!", texto: "Você é um mestre da Lógica! A expedição pela Paraíba foi um sucesso absoluto. Seu código salvou a natureza e ajudou a equipe. Você pode navegar pelos botões acima para revisar as fases anteriores." }
 };
 
@@ -153,6 +153,20 @@ function EditorBlocos() {
     }
   };
 
+  // SISTEMA DE MEDALHAS PARA OS ALUNOS
+  const renderizarMedalhas = (pontos) => {
+    const medalhas = [];
+    if (pontos >= 10) medalhas.push('🥉 Aprendiz');
+    if (pontos >= 30) medalhas.push('🥈 Desenvolvedor');
+    if (pontos >= 50) medalhas.push('🥇 Mestre');
+    if (pontos >= 80) medalhas.push('🏆 Lenda');
+    if (medalhas.length === 0) return <span style={{ color: '#7f8c8d', fontSize: '13px' }}>Sem conquistas</span>;
+
+    return medalhas.map((m, i) => (
+      <span key={i} style={{ display: 'inline-block', backgroundColor: '#fff3cd', border: '1px solid #ffeeba', padding: '4px 8px', borderRadius: '12px', fontSize: '12px', marginRight: '5px', marginBottom: '5px', color: '#856404', fontWeight: 'bold' }}>{m}</span>
+    ));
+  };
+
   if (!alunoLogado) {
     return (
       <div style={{ padding: '40px', textAlign: 'center', backgroundColor: '#f8f9fa', borderRadius: '8px', maxWidth: '400px', margin: '40px auto', border: '1px solid #ccc' }}>
@@ -196,7 +210,6 @@ function EditorBlocos() {
         })}
       </div>
 
-      {/* MISSÃO ATUAL */}
       <div aria-live="polite" role="region" aria-label="Missão atual" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#e0f7fa', padding: '15px', borderRadius: '8px', marginBottom: '20px', borderLeft: '5px solid #00bcd4' }}>
         <div>
           <h3 style={{ margin: '0 0 5px 0', color: '#006064' }}>{missaoAtual.titulo}</h3>
@@ -205,13 +218,11 @@ function EditorBlocos() {
         <button onClick={handleLogout} aria-label="Sair da sua conta" style={{ backgroundColor: '#e74c3c', color: 'white', border: 'none', padding: '8px 15px', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>Sair</button>
       </div>
 
-      {/* TELA DE FINALIZAÇÃO DA FASE 9 */}
       <div style={{ display: faseSelecionada === 9 ? 'block' : 'none', padding: '40px', textAlign: 'center', backgroundColor: '#e8f5e9', border: '2px dashed #4CAF50', borderRadius: '8px' }}>
         <h2 style={{ color: '#2e7d32' }}>🎉 Jogo Finalizado!</h2>
         <p>Utilize os botões acima para selecionar e refazer qualquer fase que desejar.</p>
       </div>
 
-      {/* ÁREA DE BLOCOS */}
       <div style={{ display: faseSelecionada === 9 ? 'none' : 'block' }}>
         <div style={{ display: 'flex', gap: '20px' }}>
           <div ref={blocklyDiv} role="application" aria-label="Área de trabalho de blocos" style={{ height: '400px', width: '100%', border: '1px solid #ccc', borderRadius: '8px' }} />
@@ -224,11 +235,9 @@ function EditorBlocos() {
         </button>
       </div>
 
-      {/* SEÇÃO DE RANKINGS */}
       <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', marginTop: '40px' }}>
-        
-        {/* RANKING INTERCLASSES */}
-        <div style={{ flex: '1 1 350px', backgroundColor: '#fff', border: '1px solid #ccc', borderRadius: '8px', padding: '20px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
+        {/* RANKING INTERCLASSES (Menor à esquerda) */}
+        <div style={{ flex: '1 1 300px', backgroundColor: '#fff', border: '1px solid #ccc', borderRadius: '8px', padding: '20px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
           <h3 style={{ marginTop: 0, color: '#d35400', display: 'flex', alignItems: 'center', gap: '8px' }}>
             🏆 Ranking Interclasses (Geral)
           </h3>
@@ -269,19 +278,21 @@ function EditorBlocos() {
           </table>
         </div>
 
-        {/* RANKING INDIVIDUAL */}
-        <div style={{ flex: '1 1 450px', backgroundColor: '#fff', border: '1px solid #ccc', borderRadius: '8px', padding: '20px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
+        {/* RANKING INDIVIDUAL (Completo e largo à direita) */}
+        <div style={{ flex: '2 1 600px', backgroundColor: '#fff', border: '1px solid #ccc', borderRadius: '8px', padding: '20px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', overflowX: 'auto' }}>
           <h3 style={{ marginTop: 0, color: '#f39c12', display: 'flex', alignItems: 'center', gap: '8px' }}>
             🌟 Top Programadores (Individual)
           </h3>
           <p style={{ fontSize: '13px', color: '#7f8c8d', marginBottom: '15px' }}>Alunos com melhor desempenho em Lógica.</p>
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '15px' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '14px', minWidth: '500px' }}>
             <thead>
               <tr style={{ borderBottom: '2px solid #eee', color: '#555' }}>
                 <th style={{ padding: '10px' }}>Posição</th>
                 <th style={{ padding: '10px' }}>Aluno</th>
                 <th style={{ padding: '10px' }}>Turma</th>
                 <th style={{ padding: '10px' }}>Pontos</th>
+                <th style={{ padding: '10px' }}>Medalhas (Conquistas)</th>
+                <th style={{ padding: '10px' }}>Fase</th>
               </tr>
             </thead>
             <tbody>
@@ -302,11 +313,15 @@ function EditorBlocos() {
                   </td>
                   <td style={{ padding: '10px', color: '#7f8c8d' }}>{aluno.nome_turma}</td>
                   <td style={{ padding: '10px', color: '#27ae60', fontWeight: 'bold' }}>{aluno.pontos_totais} pts</td>
+                  <td style={{ padding: '10px' }}>{renderizarMedalhas(aluno.pontos_totais)}</td>
+                  <td style={{ padding: '10px', color: '#34495e' }}>
+                    {aluno.nivel_atual > 8 ? 'Finalizado' : `Fase ${aluno.nivel_atual}`}
+                  </td>
                 </tr>
               ))}
               {rankingAlunos.length === 0 && (
                 <tr>
-                  <td colSpan="4" style={{ padding: '10px', textAlign: 'center', color: '#7f8c8d' }}>Nenhum dado registrado.</td>
+                  <td colSpan="6" style={{ padding: '10px', textAlign: 'center', color: '#7f8c8d' }}>Nenhum dado registrado.</td>
                 </tr>
               )}
             </tbody>

@@ -125,13 +125,13 @@ def validar_codigo(desafio: DesafioRecebido, db: Session = Depends(get_db)):
             return {"status": "sucesso", "mensagem": "✅ Código correto! Muito bem por revisar suas habilidades."}
     else:
         registro_erro = db.query(TentativaErro).filter(TentativaErro.turma_id == aluno.turma_id, TentativaErro.fase_testada == fase).first()
+        
         if not registro_erro:
-            registro_erro = TentativaErro(turma_id=aluno.turma_id, fase_testada=fase, quantity_erros=1) # Note: adjust if your model field is distinct
-            # Forçando compatibilidade com a coluna criada na tabela anterior:
             registro_erro = TentativaErro(turma_id=aluno.turma_id, fase_testada=fase, quantidade_erros=1)
             db.add(registro_erro)
         else:
             registro_erro.quantidade_erros += 1
+            
         db.commit()
         return {"status": "falha", "mensagem": mensagem_erro}
 
@@ -176,7 +176,7 @@ def obter_ranking_turmas(db: Session = Depends(get_db)):
 @app.get("/api/ranking-alunos")
 def obter_ranking_alunos(db: Session = Depends(get_db)):
     alunos = db.query(Aluno).all()
-    ranking = [{"id": a.id, "nome": a.nome, "pontos_totais": a.pontos_totais, "nome_turma": a.turma.nome_turma if a.turma else "Sem Turma"} for a in alunos]
+    ranking = [{"id": a.id, "nome": a.nome, "pontos_totais": a.pontos_totais, "nome_turma": a.turma.nome_turma if a.turma else "Sem Turma", "nivel_atual": a.nivel_atual} for a in alunos]
     ranking.sort(key=lambda x: x["pontos_totais"], reverse=True)
     return ranking
 
