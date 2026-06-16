@@ -10,6 +10,12 @@ engine = create_engine(
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
+class Professor(Base):
+    __tablename__ = "professores"
+    id = Column(Integer, primary_key=True, index=True)
+    nome = Column(String, index=True)
+    codigo_acesso = Column(String)
+
 class Turma(Base):
     __tablename__ = "turmas"
     id = Column(Integer, primary_key=True, index=True)
@@ -22,8 +28,16 @@ class Aluno(Base):
     nome = Column(String, index=True)
     codigo_acesso = Column(String)
     pontos_totais = Column(Integer, default=0)
-    nivel_atual = Column(Integer, default=1) # NOVO: Controla a fase do aluno
+    nivel_atual = Column(Integer, default=1)
     turma_id = Column(Integer, ForeignKey("turmas.id"))
     turma = relationship("Turma", back_populates="alunos")
 
+# Tabela para rastrear as dificuldades das turmas
+class TentativaErro(Base):
+    __tablename__ = "tentativas_erros"
+    id = Column(Integer, primary_key=True, index=True)
+    turma_id = Column(Integer, ForeignKey("turmas.id"))
+    fase_testada = Column(Integer)
+    quantidade_erros = Column(Integer, default=0)
+    
 Base.metadata.create_all(bind=engine)

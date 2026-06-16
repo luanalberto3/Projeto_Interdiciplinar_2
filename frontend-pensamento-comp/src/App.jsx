@@ -4,19 +4,20 @@ import EditorBlocos from './EditorBlocos';
 import DashboardProfessor from './DashboardProfessor';
 
 function App() {
-  // Estado que controla se o Modo de Alto Contraste está ligado ou desligado
   const [altoContraste, setAltoContraste] = useState(false);
 
   return (
     <BrowserRouter>
-      
-      {/* MÁGICA DA ACESSIBILIDADE (WCAG):
-        Se o estado 'altoContraste' for verdadeiro, o React injeta este bloco CSS
-        com a tag '!important' para forçar as cores acessíveis por cima de todo o site.
-      */}
-      {altoContraste && (
-        <style>
-          {`
+      <style>
+        {`
+          /* ACESSIBILIDADE DE TECLADO: Destaque visual forte ao usar o Tab */
+          a:focus, button:focus, input:focus {
+            outline: 3px solid #f39c12 !important;
+            outline-offset: 3px !important;
+          }
+
+          /* MODO DE ALTO CONTRASTE */
+          ${altoContraste ? `
             body, div, section, header, nav, table, th, td, p, h1, h2, h3, span, li, ul, input {
               background-color: #121212 !important;
               color: #ffff00 !important;
@@ -29,36 +30,29 @@ function App() {
               font-weight: bold !important;
             }
             a {
-              color: #00ffff !important; /* Ciano para links se destacarem no escuro */
+              color: #00ffff !important;
             }
-            /* Exceção para não quebrar a legibilidade das ferramentas do Blockly */
-            .blocklyMainBackground {
-              fill: #1e1e1e !important;
-            }
-            .blocklyToolboxDiv {
-              background-color: #2d2d2d !important;
-            }
-            .blocklyText {
-              fill: #000000 !important; 
-            }
-          `}
-        </style>
-      )}
+            .blocklyMainBackground { fill: #1e1e1e !important; }
+            .blocklyToolboxDiv { background-color: #2d2d2d !important; }
+            .blocklyText { fill: #000000 !important; }
+          ` : ''}
+        `}
+      </style>
 
       <main style={{ minHeight: '100vh' }}>
-        <header style={{ backgroundColor: '#2c3e50', color: 'white', padding: '15px 30px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <header role="banner" style={{ backgroundColor: '#2c3e50', color: 'white', padding: '15px 30px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <h1 style={{ margin: 0, fontSize: '20px' }}>Pensamento Computacional</h1>
           
           <div style={{ display: 'flex', alignItems: 'center', gap: '30px' }}>
-            {/* Menu de Navegação */}
-            <nav>
-              <Link to="/" style={{ color: 'white', marginRight: '20px', textDecoration: 'none', fontWeight: 'bold' }}>Área do Aluno</Link>
-              <Link to="/professor" style={{ color: '#f39c12', textDecoration: 'none', fontWeight: 'bold' }}>Painel do Professor</Link>
+            <nav aria-label="Menu principal">
+              <Link to="/" aria-label="Ir para a Área do Aluno" style={{ color: 'white', marginRight: '20px', textDecoration: 'none', fontWeight: 'bold' }}>Área do Aluno</Link>
+              <Link to="/professor" aria-label="Ir para o Painel do Professor" style={{ color: '#f39c12', textDecoration: 'none', fontWeight: 'bold' }}>Painel do Professor</Link>
             </nav>
 
-            {/* Botão de Acessibilidade */}
             <button 
               onClick={() => setAltoContraste(!altoContraste)}
+              aria-pressed={altoContraste}
+              aria-label={altoContraste ? "Desativar modo de alto contraste" : "Ativar modo de alto contraste para baixa visão"}
               style={{
                 backgroundColor: '#ecf0f1',
                 color: '#2c3e50',
@@ -72,14 +66,13 @@ function App() {
                 alignItems: 'center',
                 gap: '8px'
               }}
-              title="Ativar/Desativar Alto Contraste para baixa visão"
             >
               {altoContraste ? '☀️ MODO NORMAL' : '🌗 ALTO CONTRASTE'}
             </button>
           </div>
         </header>
-        
-        <section style={{ maxWidth: '1000px', margin: '20px auto', padding: '0 20px' }}>
+
+        <section role="main" style={{ maxWidth: '1000px', margin: '20px auto', padding: '0 20px' }}>
           <Routes>
             <Route path="/" element={<EditorBlocos />} />
             <Route path="/professor" element={<DashboardProfessor />} />
